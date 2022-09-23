@@ -69,7 +69,6 @@ public class Main {
 
     public static int calculateTotalAmount(Object plays, Object invoice) {
         int totalAmount = 0;
-        //int volumeCredits = 0;
         String result = " ";
         JSONObject invoicejsonObject = (JSONObject) invoice;
         JSONArray performances = (JSONArray) invoicejsonObject.get("performances");
@@ -106,7 +105,6 @@ public class Main {
 
     }
     public static int calculateVolumeCredits(Object plays, Object invoice) {
-     //   int totalAmount = 0;
         int volumeCredits = 0;
         String result = " ";
         JSONObject invoicejsonObject = (JSONObject) invoice;
@@ -116,26 +114,6 @@ public class Main {
             JSONObject perf = (JSONObject) performances.get(i);
             String playid = perf.get("playID").toString();
             JSONObject play = (JSONObject) playsjsonObject.get(playid);
-
-            long thisAmount = 0;
-            switch ((String) play.get("type")) {
-                case "tragedy":
-                    thisAmount = 40000;
-                    if ((long) perf.get("audience") > 30) {
-                        thisAmount += 1000 * ((long) perf.get("audience") - 30);
-                    }
-                    break;
-                case "comedy":
-                    thisAmount = 30000;
-                    if ((long) perf.get("audience") > 20) {
-                        thisAmount += 10000 + 500 * ((long) perf.get("audience") - 20);
-                    }
-                    thisAmount += 300 * (long) perf.get("audience");
-                    break;
-                default:
-                    String mess = "unknow type: " + play.get("type");
-                    throw new Error(mess);
-            }
             volumeCredits += Math.max((long) perf.get("audience") - 30, 0);
             if (((String) play.get("type")).compareTo("comedy") == 0) {
                 volumeCredits += Math.floor((long) perf.get("audience") / 5);
@@ -143,16 +121,11 @@ public class Main {
         }
         return volumeCredits;
 
-
-
-
     }
     public static String renderFooter(int totalAmount,int volumeCredits) {
-        // return "Statement for " + name + "\n";
         String result=" ";
         result += "Amount owed is " + format(totalAmount / 100) + "\n";
-         result += "You earned " + volumeCredits + "credits\n";
-         return result;
+         return result + "You earned " + volumeCredits + "credits\n";
     }
 
 
@@ -162,8 +135,7 @@ public class Main {
         JSONObject invoicejsonObject = (JSONObject) invoice;
         String result = renderHeader((String) invoicejsonObject.get("customer"));
         result += renderLines(plays,invoice);
-        result +=renderFooter(totalAmount,volumeCredits);
-        return result;
+        return result+renderFooter(totalAmount,volumeCredits);
 
     }
     public static void main(String[] args) throws Exception {
