@@ -23,6 +23,28 @@ public class Main {
     public static String renderHeader(String name) {
         return "Statement for " + name + "\n";
     }
+    
+    public static int calculateThisAmount(JSONObject perf, JSONObject play) {
+    	int thisAmount = 0;
+    	switch ((String) play.get("type")) {
+        case "tragedy":
+            thisAmount = 40000;
+            if ((long) perf.get("audience") > 30) {
+                thisAmount += 1000 * ((long) perf.get("audience") - 30);
+            }
+            return -2;
+        case "comedy":
+            thisAmount = 30000;
+            if ((long) perf.get("audience") > 20) {
+                thisAmount += 10000 + 500 * ((long) perf.get("audience") - 20);
+            }
+            thisAmount += 300 * (long) perf.get("audience");
+            return -2;
+        default:
+            return -1;
+    	}
+    	return thisAmount;
+    }
 
     public static String renderLines(Object plays, Object invoice) {
         int totalAmount = 0;
@@ -36,24 +58,12 @@ public class Main {
             String playid = perf.get("playID").toString();
             JSONObject play = (JSONObject) playsjsonObject.get(playid);
 
-            long thisAmount = 0;
-            switch ((String) play.get("type")) {
-                case "tragedy":
-                    thisAmount = 40000;
-                    if ((long) perf.get("audience") > 30) {
-                        thisAmount += 1000 * ((long) perf.get("audience") - 30);
-                    }
-                    break;
-                case "comedy":
-                    thisAmount = 30000;
-                    if ((long) perf.get("audience") > 20) {
-                        thisAmount += 10000 + 500 * ((long) perf.get("audience") - 20);
-                    }
-                    thisAmount += 300 * (long) perf.get("audience");
-                    break;
-                default:
-                    String mess = "unknow type: " + play.get("type");
-                    throw new Error(mess);
+            long thisAmount = calculateThisAmount(perf, play);
+            if (thisAmount == -2) {
+            	break;
+            } else if (thisAmount == -1) {
+            	String mess = "unknow type: " + play.get("type");
+                throw new Error(mess);
             }
             volumeCredits += Math.max((long) perf.get("audience") - 30, 0);
             if (((String) play.get("type")).compareTo("comedy") == 0) {
@@ -78,24 +88,12 @@ public class Main {
             String playid = perf.get("playID").toString();
             JSONObject play = (JSONObject) playsjsonObject.get(playid);
 
-            long thisAmount = 0;
-            switch ((String) play.get("type")) {
-                case "tragedy":
-                    thisAmount = 40000;
-                    if ((long) perf.get("audience") > 30) {
-                        thisAmount += 1000 * ((long) perf.get("audience") - 30);
-                    }
-                    break;
-                case "comedy":
-                    thisAmount = 30000;
-                    if ((long) perf.get("audience") > 20) {
-                        thisAmount += 10000 + 500 * ((long) perf.get("audience") - 20);
-                    }
-                    thisAmount += 300 * (long) perf.get("audience");
-                    break;
-                default:
-                    String mess = "unknow type: " + play.get("type");
-                    throw new Error(mess);
+            long thisAmount = calculateThisAmount(perf, play);
+            if (thisAmount == -2) {
+            	break;
+            } else if (thisAmount == -1) {
+            	String mess = "unknow type: " + play.get("type");
+                throw new Error(mess);
             }
             totalAmount += thisAmount;
         }
